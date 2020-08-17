@@ -8,8 +8,6 @@ services:
       context: ..
       dockerfile: ./.infra/dev.Dockerfile
     restart: always
-    env_file:
-      - .env
     volumes:
       - ..:/var/www:rw
 
