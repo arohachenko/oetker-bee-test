@@ -1,6 +1,7 @@
 .PHONY: all
 
 docker-exec = cd .infra && docker-compose exec record-api
+console = php bin/console
 
 start:
 	@echo "=== Starting the Docker environment ==="
@@ -13,3 +14,7 @@ stop:
 shell:
 	@echo "=== Opening a shell ==="
 	${docker-exec} sh
+
+migrate:
+	@echo "=== Running Doctrine migrations ==="
+	${docker-exec} ${console} doctrine:migrations:migrate
