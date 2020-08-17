@@ -2,10 +2,11 @@
 
 namespace App\Entity;
 
+use App\Repository\RecordRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass=RecordRepository::class)
  * @ORM\Table(name="record", indexes={
  *     @ORM\Index(name="title_idx", columns={"title"}),
  *     @ORM\Index(name="year_idx", columns={"year"})
@@ -30,12 +31,12 @@ class Record
     private string $title;
 
     /**
-     * @var Artist
+     * @var Artist|null
      *
      * @ORM\ManyToOne(targetEntity="Artist")
-     * @ORM\JoinColumn(name="artist_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="artist_id", nullable=true, referencedColumnName="id", onDelete="SET NULL")
      */
-    private Artist $artist;
+    private ?Artist $artist;
 
     /**
      * @var string
@@ -85,18 +86,18 @@ class Record
     }
 
     /**
-     * @return Artist
+     * @return Artist|null
      */
-    public function getArtist(): Artist
+    public function getArtist(): ?Artist
     {
         return $this->artist;
     }
 
     /**
-     * @param Artist $artist
+     * @param Artist|null $artist
      * @return Record
      */
-    public function setArtist(Artist $artist): Record
+    public function setArtist(?Artist $artist): Record
     {
         $this->artist = $artist;
         return $this;

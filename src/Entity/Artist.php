@@ -2,10 +2,12 @@
 
 namespace App\Entity;
 
+use App\Repository\ArtistRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass=ArtistRepository::class)
  * @ORM\Table(name="artist", indexes={
  *     @ORM\Index(name="name_idx", columns={"name"})
  * })
@@ -29,11 +31,11 @@ class Artist
     private string $name;
 
     /**
-     * @var array|Record[]
+     * @var Collection|Record[]
      *
      * @ORM\OneToMany(targetEntity="Record", mappedBy="artist")
      */
-    private array $records;
+    private Collection $records;
 
     /**
      * @return int
@@ -62,18 +64,18 @@ class Artist
     }
 
     /**
-     * @return Record[]|array
+     * @return Record[]|Collection
      */
-    public function getRecords()
+    public function getRecords(): Collection
     {
         return $this->records;
     }
 
     /**
-     * @param Record[]|array $records
+     * @param Record[]|Collection $records
      * @return Artist
      */
-    public function setRecords($records)
+    public function setRecords(Collection $records): Collection
     {
         $this->records = $records;
         return $this;
