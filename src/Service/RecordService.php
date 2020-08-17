@@ -3,19 +3,19 @@
 namespace App\Service;
 
 use App\Entity\Record;
-use App\Repository\ArtistRepository;
+use App\Repository\RecordRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class RecordService
 {
     private EntityManagerInterface $entityManager;
 
-    private ArtistRepository $artistRepository;
+    private RecordRepository $recordRepository;
 
-    public function __construct(EntityManagerInterface $entityManager, ArtistRepository $artistRepository)
+    public function __construct(EntityManagerInterface $entityManager, RecordRepository $recordRepository)
     {
         $this->entityManager = $entityManager;
-        $this->artistRepository = $artistRepository;
+        $this->recordRepository = $recordRepository;
     }
 
     public function delete(Record $record): void

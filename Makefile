@@ -19,6 +19,10 @@ migrate:
 	@echo "=== Running Doctrine migrations ==="
 	${docker-exec} ${console} doctrine:migrations:migrate
 
-make populate:
+populate:
 	@echo "=== Running data fixtures ==="
 	${docker-exec} ${console} hautelook:fixtures:load --no-bundles
+
+phpunit:
+	@echo "=== Running unit tests ==="
+	${docker-exec} php bin/phpunit
