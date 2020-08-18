@@ -2,6 +2,7 @@
 
 namespace App\Tests\Factory;
 
+use App\Entity\Artist;
 use App\Factory\JsonResponseFactory;
 use Exception;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -53,5 +54,39 @@ class JsonResponseFactoryTest extends TestCase
 
         $response = $this->jsonResponseFactory->createErrorResponse($exception);
         self::assertSame(404, $response->getStatusCode());
+    }
+
+    public function testCreateJsonResponseFromObject(): void
+    {
+        $data = $this->createMock(Artist::class);
+        $serializedData = '{"jsonstring"}';
+        $code = 418;
+
+        $this->serializerMock
+            ->expects(self::once())
+            ->method('serialize')
+            ->with($data)
+            ->willReturn($serializedData);
+
+        $response = $this->jsonResponseFactory->createJsonResponse($data, null, $code);
+        self::assertSame($serializedData, $response->getContent());
+        self::assertSame($code, $response->getStatusCode());
+    }
+
+    public function testCreateJsonResponseFromArray(): void
+    {
+        $data = [123, $this->createMock(Artist::class)];
+        $serializedData = '{"jsonstring"}';
+        $code = 418;
+
+        $this->serializerMock
+            ->expects(self::once())
+            ->method('serialize')
+            ->with($data)
+            ->willReturn($serializedData);
+
+        $response = $this->jsonResponseFactory->createJsonResponse($data, null, $code);
+        self::assertSame($serializedData, $response->getContent());
+        self::assertSame($code, $response->getStatusCode());
     }
 }

@@ -42,4 +42,11 @@ class RecordServiceTest extends TestCase
 
         $this->recordService->delete($mockData);
     }
+
+    public function testFindAll(): void
+    {
+        $this->repositoryMock->expects(self::once())->method('findAllWithArtist')->willReturn([]);
+
+        self::assertIsArray($this->recordService->findAll(0, 0));
+    }
 }

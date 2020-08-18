@@ -13,6 +13,11 @@ class RecordRepository extends ServiceEntityRepository
         parent::__construct($registry, Record::class);
     }
 
+    /**
+     * @param int $limit
+     * @param int $offset
+     * @return array|Record[]
+     */
     public function findAllWithArtist(int $limit, int $offset): array
     {
         return $this->createQueryBuilder('r')

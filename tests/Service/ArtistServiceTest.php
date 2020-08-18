@@ -42,4 +42,11 @@ class ArtistServiceTest extends TestCase
 
         $this->artistService->delete($mockData);
     }
+
+    public function testFindAll(): void
+    {
+        $this->repositoryMock->expects(self::once())->method('findBy')->willReturn([]);
+
+        self::assertIsArray($this->artistService->findAll(0, 0));
+    }
 }

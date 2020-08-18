@@ -4,9 +4,13 @@ namespace App\Tests\Controller;
 
 use App\Controller\RecordController;
 use App\Entity\Record;
+use App\Factory\JsonResponseFactory;
 use App\Service\RecordService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\InputBag;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class RecordControllerTest extends TestCase
@@ -17,6 +21,11 @@ class RecordControllerTest extends TestCase
     private MockObject $recordServiceMock;
 
     /**
+     * @var MockObject|JsonResponseFactory
+     */
+    private MockObject $responseFactoryMock;
+
+    /**
      * @var RecordController
      */
     private RecordController $controller;
@@ -24,7 +33,8 @@ class RecordControllerTest extends TestCase
     public function setUp()
     {
         $this->recordServiceMock = $this->createMock(RecordService::class);
-        $this->controller = new RecordController($this->recordServiceMock);
+        $this->responseFactoryMock = $this->createMock(JsonResponseFactory::class);
+        $this->controller = new RecordController($this->recordServiceMock, $this->responseFactoryMock);
     }
 
     public function testDeleteAction(): void
@@ -43,5 +53,49 @@ class RecordControllerTest extends TestCase
         self::expectException(NotFoundHttpException::class);
 
         $this->controller->deleteAction(null);
+    }
+
+    public function testGetAction(): void
+    {
+        /** @var MockObject|Record $recordMock */
+        $recordMock = $this->createMock(Record::class);
+        /** @var MockObject|JsonResponse $responseMock */
+        $responseMock = $this->createMock(JsonResponse::class);
+
+        $this->responseFactoryMock
+            ->expects(self::once())
+            ->method('createJsonResponse')
+            ->with($recordMock)
+            ->willReturn($responseMock);
+
+        self::assertSame($responseMock, $this->controller->getAction($recordMock));
+    }
+
+    public function testGetActionNotFound(): void
+    {
+        $this->responseFactoryMock->expects(self::never())->method('createJsonResponse');
+
+        self::expectException(NotFoundHttpException::class);
+        $this->controller->getAction(null);
+    }
+
+    public function testGetBulkAction(): void
+    {
+        /** @var MockObject|JsonResponse $responseMock */
+        $responseMock = $this->createMock(JsonResponse::class);
+
+        $inputBag = new InputBag(['limit' => 10, 'offset' => 20]);
+
+        /** @var MockObject|Request $requestMock */
+        $requestMock = $this->createMock(Request::class);
+        $requestMock->query = $inputBag;
+
+        $this->recordServiceMock->expects(self::once())->method('findAll');
+        $this->responseFactoryMock
+            ->expects(self::once())
+            ->method('createJsonResponse')
+            ->willReturn($responseMock);
+
+        self::assertSame($responseMock, $this->controller->getBulkAction($requestMock));
     }
 }
