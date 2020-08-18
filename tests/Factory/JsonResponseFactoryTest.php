@@ -3,6 +3,7 @@
 namespace App\Tests\Factory;
 
 use App\Entity\Artist;
+use App\Exception\ValidationException;
 use App\Factory\JsonResponseFactory;
 use Exception;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -10,6 +11,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\ConstraintViolationList;
 
 class JsonResponseFactoryTest extends TestCase
 {
@@ -54,6 +56,22 @@ class JsonResponseFactoryTest extends TestCase
 
         $response = $this->jsonResponseFactory->createErrorResponse($exception);
         self::assertSame(404, $response->getStatusCode());
+    }
+
+    public function testCreateErrorResponseFromValidationException(): void
+    {
+        /** @var MockObject|ConstraintViolationList $violationsMock */
+        $violationsMock = $this->createMock(ConstraintViolationList::class);
+        $exception = new ValidationException($violationsMock);
+        $this->serializerMock
+            ->expects(self::at(1))
+            ->method('serialize')
+            ->with($violationsMock)
+            ->willReturn('');
+        $this->loggerMock->expects(self::once())->method('warning');
+
+        $response = $this->jsonResponseFactory->createErrorResponse($exception);
+        self::assertSame(400, $response->getStatusCode());
     }
 
     public function testCreateJsonResponseFromObject(): void

@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Artist;
+use App\Exception\ValidationException;
 use App\Factory\JsonResponseFactory;
+use App\Factory\RequestFactory;
 use App\Service\ArtistService;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
@@ -11,6 +13,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @Route(path="/artists")
@@ -22,12 +25,22 @@ class ArtistController
 
     private ArtistService $artistService;
 
+    private RequestFactory $requestFactory;
+
     private JsonResponseFactory $responseFactory;
 
-    public function __construct(ArtistService $artistService, JsonResponseFactory $responseFactory)
-    {
+    private ValidatorInterface $validator;
+
+    public function __construct(
+        ArtistService $artistService,
+        RequestFactory $requestFactory,
+        JsonResponseFactory $responseFactory,
+        ValidatorInterface $validator
+    ) {
         $this->artistService = $artistService;
+        $this->requestFactory = $requestFactory;
         $this->responseFactory = $responseFactory;
+        $this->validator = $validator;
     }
 
     /**
@@ -101,17 +114,26 @@ class ArtistController
      *         @SWG\Items(ref=@Model(type=Artist::class, groups={"getArtist"}))
      *     )
      * )
+     * @SWG\Response(
+     *     response=JsonResponse::HTTP_BAD_REQUEST,
+     *     description="Invalid query received",
+     * )
      *
-     * @param Request $request
+     * @param Request $httpRequest
      * @return JsonResponse
      */
-    public function getBulkAction(Request $request): JsonResponse
+    public function getBulkAction(Request $httpRequest): JsonResponse
     {
-        $limit = $request->query->get('limit', 5);
-        $offset = $request->query->get('offset', 0);
+        $request = $this->requestFactory->createGenericFilterRequest($httpRequest, 5, 0);
+
+        $violations = $this->validator->validate($request, null, ['getArtist']);
+
+        if (0 !== count($violations)) {
+            throw new ValidationException($violations);
+        }
 
         return $this->responseFactory->createJsonResponse(
-            $this->artistService->findAll($limit, $offset),
+            $this->artistService->findAll($request),
             ['getArtist']
         );
     }

@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Record;
 use App\Repository\RecordRepository;
+use App\Request\GenericFilterRequest;
 use Doctrine\ORM\EntityManagerInterface;
 
 class RecordService
@@ -25,12 +26,17 @@ class RecordService
     }
 
     /**
-     * @param int $limit
-     * @param int $offset
+     * @param GenericFilterRequest $request
      * @return array|Record[]
      */
-    public function findAll(int $limit, int $offset): array
+    public function findAll(GenericFilterRequest $request): array
     {
-        return $this->recordRepository->findAllWithArtist($limit, $offset);
+        return $this->recordRepository->findAllWithArtist(
+            (int)$request->getLimit(),
+            (int)$request->getOffset(),
+            $request->getArtist(),
+            $request->getTitle(),
+            null === $request->getYear() ? null : (int)$request->getYear()
+        );
     }
 }

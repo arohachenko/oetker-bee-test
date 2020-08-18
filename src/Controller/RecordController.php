@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Record;
+use App\Exception\ValidationException;
 use App\Factory\JsonResponseFactory;
+use App\Factory\RequestFactory;
 use App\Service\RecordService;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
@@ -11,6 +13,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @Route(path="/records")
@@ -22,12 +25,22 @@ class RecordController
 
     private RecordService $recordService;
 
+    private RequestFactory $requestFactory;
+
     private JsonResponseFactory $responseFactory;
 
-    public function __construct(RecordService $recordService, JsonResponseFactory $responseFactory)
-    {
+    private ValidatorInterface $validator;
+
+    public function __construct(
+        RecordService $recordService,
+        RequestFactory $requestFactory,
+        JsonResponseFactory $responseFactory,
+        ValidatorInterface $validator
+    ) {
         $this->recordService = $recordService;
+        $this->requestFactory = $requestFactory;
         $this->responseFactory = $responseFactory;
+        $this->validator = $validator;
     }
 
     /**
@@ -89,6 +102,24 @@ class RecordController
      *     required=false,
      *     type="integer"
      * )
+     * @SWG\Parameter(
+     *     name="artist",
+     *     in="query",
+     *     required=false,
+     *     type="string"
+     * )
+     * @SWG\Parameter(
+     *     name="title",
+     *     in="query",
+     *     required=false,
+     *     type="string"
+     * )
+     * @SWG\Parameter(
+     *     name="year",
+     *     in="query",
+     *     required=false,
+     *     type="integer"
+     * )
      * @SWG\Response(
      *     response=JsonResponse::HTTP_OK,
      *     description="Returns all existing records with artists, ordered by artist and title",
@@ -97,17 +128,26 @@ class RecordController
      *         @SWG\Items(ref=@Model(type=Record::class, groups={"getRecord"}))
      *     )
      * )
+     * @SWG\Response(
+     *     response=JsonResponse::HTTP_BAD_REQUEST,
+     *     description="Invalid query received",
+     * )
      *
-     * @param Request $request
+     * @param Request $httpRequest
      * @return JsonResponse
      */
-    public function getBulkAction(Request $request): JsonResponse
+    public function getBulkAction(Request $httpRequest): JsonResponse
     {
-        $limit = $request->query->get('limit', 20);
-        $offset = $request->query->get('offset', 0);
+        $request = $this->requestFactory->createGenericFilterRequest($httpRequest, 20, 0);
+
+        $violations = $this->validator->validate($request, null, ['getRecord']);
+
+        if (0 !== count($violations)) {
+            throw new ValidationException($violations);
+        }
 
         return $this->responseFactory->createJsonResponse(
-            $this->recordService->findAll($limit, $offset),
+            $this->recordService->findAll($request),
             ['getRecord']
         );
     }

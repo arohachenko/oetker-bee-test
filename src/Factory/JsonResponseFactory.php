@@ -2,6 +2,7 @@
 
 namespace App\Factory;
 
+use App\Exception\ValidationException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -49,7 +50,10 @@ class JsonResponseFactory implements LoggerAwareInterface
     {
         $response = $this->serializer->serialize(['message' => $exception->getMessage()], 'json');
 
-        if ($exception instanceof HttpException) {
+        if ($exception instanceof ValidationException) {
+            $statusCode = $exception->getStatusCode();
+            $response = $this->serializer->serialize($exception->getList(), 'json');
+        } elseif ($exception instanceof HttpException) {
             $statusCode = $exception->getStatusCode();
         } else {
             $statusCode = JsonResponse::HTTP_INTERNAL_SERVER_ERROR;

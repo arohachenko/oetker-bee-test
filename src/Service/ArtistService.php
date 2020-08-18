@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Artist;
 use App\Repository\ArtistRepository;
+use App\Request\GenericFilterRequest;
 use Doctrine\ORM\EntityManagerInterface;
 
 class ArtistService
@@ -25,12 +26,16 @@ class ArtistService
     }
 
     /**
-     * @param int $limit
-     * @param int $offset
+     * @param GenericFilterRequest $request
      * @return array|Artist[]
      */
-    public function findAll(int $limit, int $offset): array
+    public function findAll(GenericFilterRequest $request): array
     {
-        return $this->artistRepository->findBy([], ['name' => 'asc'], $limit, $offset);
+        return $this->artistRepository->findBy(
+            [],
+            ['name' => 'asc'],
+            (int)$request->getLimit(),
+            (int)$request->getOffset()
+        );
     }
 }
