@@ -54,6 +54,6 @@ class RecordRepositoryTest extends TestCase
         $this->queryBuilderMock->method('getQuery')->willReturn($queryMock);
         $this->queryBuilderMock->method(self::matchesRegularExpression('/((?!getQuery).)*/'))->willReturnSelf();
 
-        self::assertIsArray($this->repository->findAllWithArtist(1, 2));
+        self::assertIsArray($this->repository->findAllWithArtist(1, 2, 'name', 'album', 1970));
     }
 }
