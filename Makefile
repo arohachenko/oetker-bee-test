@@ -12,6 +12,7 @@ info:
 	@echo "make phpunit                         Run all the tests there are"
 	@echo "make shell                           Open a shell in the php-fpm container"
 	@echo "make populate                        Prefill database with sample data"
+	@echo "make cache-clear                     Clear Symfony cache"
 	@echo ""
 
 docker-exec = cd .infra && docker-compose exec record-api
@@ -44,3 +45,7 @@ populate:
 phpunit:
 	@echo "=== Running unit tests ==="
 	${docker-exec} php bin/phpunit
+
+cache-clear:
+	@echo "=== Clearing Symfony cache ==="
+	${docker-exec} ${console} cache:clear
