@@ -2,6 +2,8 @@
 
 namespace App\Tests\Factory;
 
+use App\Entity\Artist;
+use App\Exception\ValidationException;
 use App\Factory\JsonResponseFactory;
 use Exception;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -9,6 +11,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\ConstraintViolationList;
 
 class JsonResponseFactoryTest extends TestCase
 {
@@ -53,5 +56,55 @@ class JsonResponseFactoryTest extends TestCase
 
         $response = $this->jsonResponseFactory->createErrorResponse($exception);
         self::assertSame(404, $response->getStatusCode());
+    }
+
+    public function testCreateErrorResponseFromValidationException(): void
+    {
+        /** @var MockObject|ConstraintViolationList $violationsMock */
+        $violationsMock = $this->createMock(ConstraintViolationList::class);
+        $exception = new ValidationException($violationsMock);
+        $this->serializerMock
+            ->expects(self::at(1))
+            ->method('serialize')
+            ->with($violationsMock)
+            ->willReturn('');
+        $this->loggerMock->expects(self::once())->method('warning');
+
+        $response = $this->jsonResponseFactory->createErrorResponse($exception);
+        self::assertSame(400, $response->getStatusCode());
+    }
+
+    public function testCreateJsonResponseFromObject(): void
+    {
+        $data = $this->createMock(Artist::class);
+        $serializedData = '{"jsonstring"}';
+        $code = 418;
+
+        $this->serializerMock
+            ->expects(self::once())
+            ->method('serialize')
+            ->with($data)
+            ->willReturn($serializedData);
+
+        $response = $this->jsonResponseFactory->createJsonResponse($data, null, $code);
+        self::assertSame($serializedData, $response->getContent());
+        self::assertSame($code, $response->getStatusCode());
+    }
+
+    public function testCreateJsonResponseFromArray(): void
+    {
+        $data = [123, $this->createMock(Artist::class)];
+        $serializedData = '{"jsonstring"}';
+        $code = 418;
+
+        $this->serializerMock
+            ->expects(self::once())
+            ->method('serialize')
+            ->with($data)
+            ->willReturn($serializedData);
+
+        $response = $this->jsonResponseFactory->createJsonResponse($data, null, $code);
+        self::assertSame($serializedData, $response->getContent());
+        self::assertSame($code, $response->getStatusCode());
     }
 }

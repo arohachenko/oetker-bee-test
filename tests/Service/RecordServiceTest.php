@@ -4,6 +4,7 @@ namespace App\Tests\Service;
 
 use App\Entity\Record;
 use App\Repository\RecordRepository;
+use App\Request\GenericFilterRequest;
 use App\Service\RecordService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -41,5 +42,15 @@ class RecordServiceTest extends TestCase
         $this->entityManagerMock->expects(self::at(1))->method('flush')->with();
 
         $this->recordService->delete($mockData);
+    }
+
+    public function testFindAll(): void
+    {
+        /** @var MockObject|GenericFilterRequest $requestMock */
+        $requestMock = $this->createMock(GenericFilterRequest::class);
+
+        $this->repositoryMock->expects(self::once())->method('findAllWithArtist')->willReturn([]);
+
+        self::assertIsArray($this->recordService->findAll($requestMock));
     }
 }

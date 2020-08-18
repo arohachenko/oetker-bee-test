@@ -5,11 +5,12 @@ namespace App\Entity;
 use App\Repository\ArtistRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=ArtistRepository::class)
- * @ORM\Table(name="artist", indexes={
- *     @ORM\Index(name="name_idx", columns={"name"})
+ * @ORM\Table(name="artist", uniqueConstraints={
+ *     @ORM\UniqueConstraint(name="name_uniq", columns={"name"})
  * })
  */
 class Artist
@@ -20,6 +21,7 @@ class Artist
      * @ORM\Id
      * @ORM\Column(name="id", type="integer", options={"unsigned":true})
      * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @Groups({"getArtist", "getRecord"})
      */
     private int $id;
 
@@ -27,6 +29,7 @@ class Artist
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255)
+     * @Groups({"getArtist", "putArtist", "postArtist", "getRecord", "putRecord", "postRecord"})
      */
     private string $name;
 
@@ -34,6 +37,7 @@ class Artist
      * @var Collection|Record[]
      *
      * @ORM\OneToMany(targetEntity="Record", mappedBy="artist")
+     * @Groups({"getArtist"})
      */
     private Collection $records;
 

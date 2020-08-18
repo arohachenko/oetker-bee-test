@@ -3,11 +3,17 @@
 namespace App\Controller;
 
 use App\Entity\Artist;
+use App\Exception\ValidationException;
+use App\Factory\JsonResponseFactory;
+use App\Factory\RequestFactory;
 use App\Service\ArtistService;
+use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @Route(path="/artists")
@@ -15,11 +21,26 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class ArtistController
 {
+    private const MESSAGE_NOT_FOUND = 'Artist not found';
+
     private ArtistService $artistService;
 
-    public function __construct(ArtistService $artistService)
-    {
+    private RequestFactory $requestFactory;
+
+    private JsonResponseFactory $responseFactory;
+
+    private ValidatorInterface $validator;
+
+    public function __construct(
+        ArtistService $artistService,
+        RequestFactory $requestFactory,
+        JsonResponseFactory $responseFactory,
+        ValidatorInterface $validator
+    ) {
         $this->artistService = $artistService;
+        $this->requestFactory = $requestFactory;
+        $this->responseFactory = $responseFactory;
+        $this->validator = $validator;
     }
 
     /**
@@ -28,6 +49,10 @@ class ArtistController
      *     response=JsonResponse::HTTP_NO_CONTENT,
      *     description="Deletion successful",
      * )
+     * @SWG\Response(
+     *     response=JsonResponse::HTTP_NOT_FOUND,
+     *     description="Could'n find artist with this ID",
+     * )
      *
      * @param Artist|null $artist
      * @return JsonResponse
@@ -35,11 +60,81 @@ class ArtistController
     public function deleteAction(Artist $artist = null): JsonResponse
     {
         if (null === $artist) {
-            throw new NotFoundHttpException('Artist not found');
+            throw new NotFoundHttpException(self::MESSAGE_NOT_FOUND);
         }
 
         $this->artistService->delete($artist);
 
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * @Route(methods={"GET"}, path="/{id<\d+>}")
+     * @SWG\Response(
+     *     response=JsonResponse::HTTP_OK,
+     *     description="Returns an existing artist",
+     *     @Model(type=Artist::class, groups={"getArtist"})
+     * )
+     * @SWG\Response(
+     *     response=JsonResponse::HTTP_NOT_FOUND,
+     *     description="Could'nt find artist with this ID",
+     * )
+     *
+     * @param Artist|null $artist
+     * @return JsonResponse
+     */
+    public function getAction(Artist $artist = null): JsonResponse
+    {
+        if (null === $artist) {
+            throw new NotFoundHttpException(self::MESSAGE_NOT_FOUND);
+        }
+
+        return $this->responseFactory->createJsonResponse($artist, ['getArtist']);
+    }
+
+    /**
+     * @Route(methods={"GET"}, path="")
+     * @SWG\Parameter(
+     *     name="limit",
+     *     in="query",
+     *     required=false,
+     *     type="integer"
+     * )
+     * @SWG\Parameter(
+     *     name="offset",
+     *     in="query",
+     *     required=false,
+     *     type="integer"
+     * )
+     * @SWG\Response(
+     *     response=JsonResponse::HTTP_OK,
+     *     description="Returns all existing artists with records",
+     *     @SWG\Schema(
+     *         type="array",
+     *         @SWG\Items(ref=@Model(type=Artist::class, groups={"getArtist"}))
+     *     )
+     * )
+     * @SWG\Response(
+     *     response=JsonResponse::HTTP_BAD_REQUEST,
+     *     description="Invalid query received",
+     * )
+     *
+     * @param Request $httpRequest
+     * @return JsonResponse
+     */
+    public function getBulkAction(Request $httpRequest): JsonResponse
+    {
+        $request = $this->requestFactory->createGenericFilterRequest($httpRequest, 5, 0);
+
+        $violations = $this->validator->validate($request, null, ['getArtist']);
+
+        if (0 !== count($violations)) {
+            throw new ValidationException($violations);
+        }
+
+        return $this->responseFactory->createJsonResponse(
+            $this->artistService->findAll($request),
+            ['getArtist']
+        );
     }
 }

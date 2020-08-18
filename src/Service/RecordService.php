@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Record;
 use App\Repository\RecordRepository;
+use App\Request\GenericFilterRequest;
 use Doctrine\ORM\EntityManagerInterface;
 
 class RecordService
@@ -22,5 +23,20 @@ class RecordService
     {
         $this->entityManager->remove($record);
         $this->entityManager->flush();
+    }
+
+    /**
+     * @param GenericFilterRequest $request
+     * @return array|Record[]
+     */
+    public function findAll(GenericFilterRequest $request): array
+    {
+        return $this->recordRepository->findAllWithArtist(
+            (int)$request->getLimit(),
+            (int)$request->getOffset(),
+            $request->getArtist(),
+            $request->getTitle(),
+            null === $request->getYear() ? null : (int)$request->getYear()
+        );
     }
 }
