@@ -23,4 +23,14 @@ class RecordService
         $this->entityManager->remove($record);
         $this->entityManager->flush();
     }
+
+    /**
+     * @param int $limit
+     * @param int $offset
+     * @return array|Record[]
+     */
+    public function findAll(int $limit, int $offset): array
+    {
+        return $this->recordRepository->findAllWithArtist($limit, $offset);
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\RecordRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=RecordRepository::class)
@@ -20,6 +21,7 @@ class Record
      * @ORM\Id
      * @ORM\Column(name="id", type="integer", options={"unsigned":true})
      * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @Groups({"getArtist", "getRecord"})
      */
     private int $id;
 
@@ -27,6 +29,7 @@ class Record
      * @var string
      *
      * @ORM\Column(name="title", type="string", length=255)
+     * @Groups({"getArtist", "getRecord", "putRecord", "postRecord"})
      */
     private string $title;
 
@@ -35,6 +38,7 @@ class Record
      *
      * @ORM\ManyToOne(targetEntity="Artist")
      * @ORM\JoinColumn(name="artist_id", nullable=true, referencedColumnName="id", onDelete="SET NULL")
+     * @Groups({"getRecord", "putRecord", "postRecord"})
      */
     private ?Artist $artist;
 
@@ -42,6 +46,7 @@ class Record
      * @var string
      *
      * @ORM\Column(name="label", type="string", length=255)
+     * @Groups({"getArtist", "getRecord", "putRecord", "postRecord"})
      */
     private string $label;
 
@@ -49,6 +54,7 @@ class Record
      * @var int
      *
      * @ORM\Column(name="year", type="smallint", options={"unsigned":true})
+     * @Groups({"getArtist", "getRecord", "putRecord", "postRecord"})
      */
     private int $year;
 
@@ -56,6 +62,7 @@ class Record
      * @var string
      *
      * @ORM\Column(name="type", type="string", length=50)
+     * @Groups({"getArtist", "getRecord", "putRecord", "postRecord"})
      */
     private string $type;
 

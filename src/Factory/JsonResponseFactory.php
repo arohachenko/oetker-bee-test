@@ -6,7 +6,6 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Serializer\SerializerInterface;
 use Throwable;
 
@@ -30,6 +29,16 @@ class JsonResponseFactory implements LoggerAwareInterface
     public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
+    }
+
+    public function createJsonResponse($data, ?array $groups = null, ?int $statusCode = null): JsonResponse
+    {
+        return new JsonResponse(
+            $this->serializer->serialize($data, 'json', ['groups' => $groups]),
+            $statusCode ?? JsonResponse::HTTP_OK,
+            [],
+            true
+        );
     }
 
     /**

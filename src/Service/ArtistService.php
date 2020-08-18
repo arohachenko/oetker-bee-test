@@ -23,4 +23,14 @@ class ArtistService
         $this->entityManager->remove($artist);
         $this->entityManager->flush();
     }
+
+    /**
+     * @param int $limit
+     * @param int $offset
+     * @return array|Artist[]
+     */
+    public function findAll(int $limit, int $offset): array
+    {
+        return $this->artistRepository->findBy([], ['name' => 'asc'], $limit, $offset);
+    }
 }
