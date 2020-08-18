@@ -2,22 +2,34 @@
 
 namespace App\Factory;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Serializer\SerializerInterface;
 use Throwable;
-use UnexpectedValueException;
 
-class JsonResponseFactory
+class JsonResponseFactory implements LoggerAwareInterface
 {
     /**
      * @var SerializerInterface
      */
     private SerializerInterface $serializer;
 
+    /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
+
     public function __construct(SerializerInterface $serializer)
     {
         $this->serializer = $serializer;
+    }
+
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
     }
 
     /**
@@ -26,19 +38,16 @@ class JsonResponseFactory
      */
     public function createErrorResponse(Throwable $exception): JsonResponse
     {
-        switch (true) {
-            case $exception instanceof HttpException:
-                $statusCode = $exception->getStatusCode();
-                break;
-            case $exception instanceof UnexpectedValueException:
-                $statusCode = JsonResponse::HTTP_BAD_REQUEST;
-                break;
-            default:
-                $statusCode = JsonResponse::HTTP_INTERNAL_SERVER_ERROR;
+        $response = $this->serializer->serialize(['message' => $exception->getMessage()], 'json');
+
+        if ($exception instanceof HttpException) {
+            $statusCode = $exception->getStatusCode();
+        } else {
+            $statusCode = JsonResponse::HTTP_INTERNAL_SERVER_ERROR;
         }
 
-        return new JsonResponse($this->serializer->serialize($exception, 'json', [
-            'statusCode' => $statusCode,
-        ]), $statusCode, [], true);
+        $this->logger->warning(sprintf('%s: %s', get_class($exception), $exception->getMessage()));
+
+        return new JsonResponse($response, $statusCode, [], true);
     }
 }

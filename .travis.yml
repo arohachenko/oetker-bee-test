@@ -1,0 +1,12 @@
+os: linux
+dist: xenial
+language: php
+php:
+  - 7.4
+install:
+  - composer self-update
+  - composer install --no-interaction --prefer-source --dev
+script:
+  - php bin/phpunit --coverage-clover coverage.xml
+after_success:
+  - bash <(curl -s https://codecov.io/bash)

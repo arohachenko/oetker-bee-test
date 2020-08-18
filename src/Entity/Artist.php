@@ -75,7 +75,7 @@ class Artist
      * @param Record[]|Collection $records
      * @return Artist
      */
-    public function setRecords(Collection $records): Collection
+    public function setRecords(Collection $records): Artist
     {
         $this->records = $records;
         return $this;
