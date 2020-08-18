@@ -33,7 +33,7 @@ class RecordServiceTest extends TestCase
         $this->recordService = new RecordService($this->entityManagerMock, $this->repositoryMock);
     }
 
-    public function testDelete()
+    public function testDelete(): void
     {
         /** @var MockObject|Record $mockData */
         $mockData = $this->createMock(Record::class);

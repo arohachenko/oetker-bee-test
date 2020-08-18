@@ -30,12 +30,12 @@ class SymfonyEventsSubscriberTest extends TestCase
         $this->subscriber = new SymfonyEventsSubscriber($this->responseFactoryMock);
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         self::assertIsArray(SymfonyEventsSubscriber::getSubscribedEvents());
     }
 
-    public function testConvertErrorToJson()
+    public function testConvertErrorToJson(): void
     {
         $exception = new Exception;
         $response = new JsonResponse();
@@ -66,7 +66,7 @@ class SymfonyEventsSubscriberTest extends TestCase
         self::assertSame($response, $event->getResponse());
     }
 
-    public function testConvertErrorToJsonNotApplicable()
+    public function testConvertErrorToJsonNotApplicable(): void
     {
         $exception = new Exception;
 
