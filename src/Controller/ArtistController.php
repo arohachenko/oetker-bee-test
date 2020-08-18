@@ -6,6 +6,7 @@ use App\Entity\Artist;
 use App\Service\ArtistService;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -28,11 +29,15 @@ class ArtistController
      *     description="Deletion successful",
      * )
      *
-     * @param Artist $artist
+     * @param Artist|null $artist
      * @return JsonResponse
      */
-    public function deleteAction(Artist $artist): JsonResponse
+    public function deleteAction(Artist $artist = null): JsonResponse
     {
+        if (null === $artist) {
+            throw new NotFoundHttpException('Artist not found');
+        }
+
         $this->artistService->delete($artist);
 
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);

@@ -6,6 +6,7 @@ use App\Entity\Record;
 use App\Service\RecordService;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -28,11 +29,15 @@ class RecordController
      *     description="Deletion successful",
      * )
      *
-     * @param Record $record
+     * @param Record|null $record
      * @return JsonResponse
      */
-    public function deleteAction(Record $record): JsonResponse
+    public function deleteAction(Record $record = null): JsonResponse
     {
+        if (null === $record) {
+            throw new NotFoundHttpException('Record not found');
+        }
+
         $this->recordService->delete($record);
 
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
