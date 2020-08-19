@@ -152,7 +152,7 @@ class ArtistController extends BaseRestController
      *     description="Artist not found",
      * )
      * @SWG\Response(
-     *     response=JsonResponse::HTTP_BAD_REQUEST,
+     *     response=JsonResponse::HTTP_UNPROCESSABLE_ENTITY,
      *     description="Invalid request body",
      * )
      *
@@ -197,7 +197,7 @@ class ArtistController extends BaseRestController
      *     )
      * )
      * @SWG\Response(
-     *     response=JsonResponse::HTTP_BAD_REQUEST,
+     *     response=JsonResponse::HTTP_UNPROCESSABLE_ENTITY,
      *     description="Invalid request body",
      * )
      *
