@@ -40,10 +40,13 @@ migrate:
 
 populate:
 	@echo "=== Running data fixtures ==="
-	${docker-exec} ${console} hautelook:fixtures:load --no-bundles
+	${docker-exec} ${console} hautelook:fixtures:load --no-bundles --env=dev
 
 phpunit:
-	@echo "=== Running unit tests ==="
+	@echo "=== Running tests ==="
+	${docker-exec} ${console} doctrine:database:create --env=test
+	${docker-exec} ${console} doctrine:schema:update --force --env=test
+	${docker-exec} ${console} hautelook:fixtures:load --no-bundles -q --env=test
 	${docker-exec} php bin/phpunit
 
 cache-clear:
