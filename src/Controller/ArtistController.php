@@ -8,6 +8,7 @@ use App\Factory\RequestFactory;
 use App\Request\SaveArtistRequest;
 use App\Service\ArtistService;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,6 +39,7 @@ class ArtistController extends BaseRestController
     }
 
     /**
+     * @IsGranted("ROLE_ADMIN")
      * @Route(methods={"DELETE"}, path="/{id<\d+>}")
      * @SWG\Response(
      *     response=JsonResponse::HTTP_NO_CONTENT,
@@ -129,6 +131,7 @@ class ArtistController extends BaseRestController
     }
 
     /**
+     * @IsGranted("ROLE_ADMIN")
      * @Route(methods={"PUT"}, path="/{id<\d+>}")
      * @SWG\Parameter(
      *     name="artist",
@@ -177,6 +180,7 @@ class ArtistController extends BaseRestController
     }
 
     /**
+     * @IsGranted("ROLE_ADMIN")
      * @Route(methods={"POST"}, path="")
      * @SWG\Parameter(
      *     name="artist",

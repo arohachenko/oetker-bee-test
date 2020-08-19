@@ -2,11 +2,11 @@
 
 namespace App\Exception;
 
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
-class ValidationException extends BadRequestHttpException
+class ValidationException extends UnprocessableEntityHttpException
 {
     private ConstraintViolationListInterface $list;
 
