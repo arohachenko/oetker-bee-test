@@ -1,0 +1,16 @@
+os: linux
+dist: xenial
+language: php
+php:
+  - 7.4
+install:
+  - composer self-update
+  - composer install --no-interaction --prefer-source --dev
+before_script:
+  - php bin/console doctrine:database:create --env=test
+  - php bin/console doctrine:schema:update --force --env=test
+  - php bin/console hautelook:fixtures:load --no-bundles -q --env=test
+script:
+  - php bin/phpunit --coverage-clover coverage.xml
+after_success:
+  - bash <(curl -s https://codecov.io/bash)

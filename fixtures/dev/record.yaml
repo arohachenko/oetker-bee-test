@@ -1,0 +1,13 @@
+App\Entity\Record:
+  record_{1..30}:
+    title: "<randomElement([Ace,King,Queen,Master,Slayer,Bottle,Land,Symphony])> of <randomElement(['my ','all ',''])><randomElement([Spades,Clubs,Hearts,Pikes,Base,Mess,Head,Dreams,Summer,Desire,Beer,Servers,PHP])>"
+    artist: '@artist_*'
+    label: <company()>
+    year: <year()>
+    type: <randomElement([LP,EP,Cassette,Tape Reel,CD])>
+  record_{31..40}:
+    title: "<randomElement([Loving,Dreaming of,Breakfast at,All about,<title()>])> <firstName()>"
+    artist: '@artist_*'
+    label: <company()>
+    year: <year()>
+    type: <randomElement([LP,EP,Cassette,Tape Reel,CD])>

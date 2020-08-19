@@ -1,0 +1,21 @@
+App\Entity\Artist:
+  artist_1:
+    name: 'Pink Freud'
+  artist_2:
+    name: 'BABBA'
+  artist_3:
+    name: 'King'
+  artist_4:
+    name: 'The Standing Stones'
+  artist_5:
+    name: 'Shallow Purple'
+  artist_6:
+    name: 'The Spiders'
+  artist_7:
+    name: 'Michael Jordan'
+  artist_8:
+    name: 'Incandescent Zeppelin'
+  artist_9:
+    name: 'Funk Sinatra'
+  artist_10:
+    name: 'Britney Clubs'

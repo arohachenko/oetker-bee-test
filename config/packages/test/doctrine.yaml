@@ -1,0 +1,9 @@
+doctrine:
+    dbal:
+        url: '%env(trim:DATABASE_URL)%'
+        server_version: '5.7'
+        host:
+        port:
+        user:
+        password:
+        dbname:
