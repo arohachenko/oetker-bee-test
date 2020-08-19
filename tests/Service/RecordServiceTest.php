@@ -3,6 +3,7 @@
 namespace App\Tests\Service;
 
 use App\Entity\Record;
+use App\Repository\ArtistRepository;
 use App\Repository\RecordRepository;
 use App\Request\GenericFilterRequest;
 use App\Service\RecordService;
@@ -23,6 +24,11 @@ class RecordServiceTest extends TestCase
     private MockObject $repositoryMock;
 
     /**
+     * @var ArtistRepository|MockObject
+     */
+    private MockObject $artistRepositoryMock;
+
+    /**
      * @var RecordService
      */
     private RecordService $recordService;
@@ -31,7 +37,12 @@ class RecordServiceTest extends TestCase
     {
         $this->entityManagerMock = $this->createMock(EntityManagerInterface::class);
         $this->repositoryMock = $this->createMock(RecordRepository::class);
-        $this->recordService = new RecordService($this->entityManagerMock, $this->repositoryMock);
+        $this->artistRepositoryMock = $this->createMock(ArtistRepository::class);
+        $this->recordService = new RecordService(
+            $this->entityManagerMock,
+            $this->repositoryMock,
+            $this->artistRepositoryMock
+        );
     }
 
     public function testDelete(): void

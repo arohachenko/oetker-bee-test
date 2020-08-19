@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Artist;
-use App\Exception\ValidationException;
 use App\Factory\JsonResponseFactory;
 use App\Factory\RequestFactory;
 use App\Request\SaveArtistRequest;
@@ -167,12 +166,12 @@ class ArtistController extends BaseRestController
         $this->validateJsonBody($httpRequest);
 
         /** @var SaveArtistRequest $request */
-        $request = $this->requestFactory->createByType($httpRequest, SaveArtistRequest::class);
+        $request = $this->requestFactory->createFromJsonBody($httpRequest, SaveArtistRequest::class);
 
         $this->validateRequestDTO($request, ['putArtist']);
 
         return $this->responseFactory->createJsonResponse(
-            $this->artistService->updateArtist($artist, $request),
+            $this->artistService->update($artist, $request),
             ['getArtist']
         );
     }
@@ -206,12 +205,12 @@ class ArtistController extends BaseRestController
         $this->validateJsonBody($httpRequest);
 
         /** @var SaveArtistRequest $request */
-        $request = $this->requestFactory->createByType($httpRequest, SaveArtistRequest::class);
+        $request = $this->requestFactory->createFromJsonBody($httpRequest, SaveArtistRequest::class);
 
         $this->validateRequestDTO($request, ['postArtist']);
 
         return $this->responseFactory->createJsonResponse(
-            $this->artistService->createArtist($request),
+            $this->artistService->create($request),
             ['getArtist'],
             JsonResponse::HTTP_CREATED
         );

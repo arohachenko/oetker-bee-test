@@ -9,22 +9,22 @@ class SaveArtistRequest extends RequestDTO
     /**
      * @Assert\NotNull(groups={"postArtist", "putArtist"})
      * @Assert\Length(min="1", max="255", groups={"postArtist", "putArtist"})
-     * @var string|null
+     * @var mixed|null
      */
-    private ?string $name;
+    private $name;
 
     /**
-     * @param string|null $name
+     * @param mixed|null $name
      */
-    public function __construct(?string $name = null)
+    public function __construct($name = null)
     {
         $this->name = null === $name ? null : trim($name);
     }
 
     /**
-     * @return string|null
+     * @return mixed|null
      */
-    public function getName(): ?string
+    public function getName()
     {
         return $this->name;
     }

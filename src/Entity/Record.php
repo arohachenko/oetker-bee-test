@@ -36,7 +36,7 @@ class Record
     /**
      * @var Artist|null
      *
-     * @ORM\ManyToOne(targetEntity="Artist")
+     * @ORM\ManyToOne(targetEntity="Artist", cascade={"persist"})
      * @ORM\JoinColumn(name="artist_id", nullable=true, referencedColumnName="id", onDelete="SET NULL")
      * @Groups({"getRecord", "putRecord", "postRecord"})
      */

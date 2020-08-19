@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Record;
 use App\Factory\JsonResponseFactory;
 use App\Factory\RequestFactory;
+use App\Request\SaveRecordRequest;
 use App\Service\RecordService;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
@@ -138,6 +139,94 @@ class RecordController extends BaseRestController
         return $this->responseFactory->createJsonResponse(
             $this->recordService->findAll($request),
             ['getRecord']
+        );
+    }
+
+    /**
+     * @Route(methods={"PUT"}, path="/{id<\d+>}")
+     * @SWG\Parameter(
+     *     name="record",
+     *     in="body",
+     *     required=true,
+     *     @Model(type=Record::class, groups={"putRecord", "putArtist"})
+     * )
+     * @SWG\Response(
+     *     response=JsonResponse::HTTP_OK,
+     *     description="Record updated successfully",
+     *     @SWG\Schema(
+     *         type="array",
+     *         @SWG\Items(ref=@Model(type=Record::class, groups={"getRecord"}))
+     *     )
+     * )
+     * @SWG\Response(
+     *     response=JsonResponse::HTTP_NOT_FOUND,
+     *     description="Record not found",
+     * )
+     * @SWG\Response(
+     *     response=JsonResponse::HTTP_BAD_REQUEST,
+     *     description="Invalid request body",
+     * )
+     *
+     * @param Request $httpRequest
+     * @param Record|null $record
+     * @return JsonResponse
+     */
+    public function putAction(Request $httpRequest, ?Record $record = null): JsonResponse
+    {
+        if (null === $record) {
+            throw new NotFoundHttpException(self::MESSAGE_NOT_FOUND);
+        }
+
+        $this->validateJsonBody($httpRequest);
+
+        /** @var SaveRecordRequest $request */
+        $request = $this->requestFactory->createFromJsonBody($httpRequest, SaveRecordRequest::class);
+
+        $this->validateRequestDTO($request, ['putRecord', 'putArtist']);
+
+        return $this->responseFactory->createJsonResponse(
+            $this->recordService->update($record, $request),
+            ['getRecord']
+        );
+    }
+
+    /**
+     * @Route(methods={"POST"}, path="")
+     * @SWG\Parameter(
+     *     name="record",
+     *     in="body",
+     *     required=true,
+     *     @Model(type=Record::class, groups={"postRecord", "postArtist"})
+     * )
+     * @SWG\Response(
+     *     response=JsonResponse::HTTP_CREATED,
+     *     description="Record created successfully",
+     *     @SWG\Schema(
+     *         type="array",
+     *         @SWG\Items(ref=@Model(type=Record::class, groups={"getRecord"}))
+     *     )
+     * )
+     * @SWG\Response(
+     *     response=JsonResponse::HTTP_BAD_REQUEST,
+     *     description="Invalid request body",
+     * )
+     *
+     * @param Request $httpRequest
+     * @return JsonResponse
+     */
+    public function postAction(Request $httpRequest): JsonResponse
+    {
+        $this->validateJsonBody($httpRequest);
+
+        /** @var SaveRecordRequest $request */
+        $request = $this->requestFactory->createFromJsonBody($httpRequest, SaveRecordRequest::class);
+
+        $this->validateRequestDTO($request, ['postRecord', 'postArtist']);
+
+        return $this->responseFactory->createJsonResponse(
+            $this->recordService->create($request),
+            ['getRecord'],
+            JsonResponse::HTTP_CREATED
         );
     }
 }

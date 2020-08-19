@@ -3,19 +3,25 @@
 namespace App\Tests\Factory;
 
 use App\Factory\RequestFactory;
-use App\Request\GenericFilterRequest;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class RequestFactoryTest extends TestCase
 {
+    /**
+     * @var MockObject|SerializerInterface
+     */
+    private MockObject $serializerMock;
+
     private RequestFactory $requestFactory;
 
     public function setUp()
     {
-        $this->requestFactory = new RequestFactory();
+        $this->serializerMock = $this->createMock(SerializerInterface::class);
+        $this->requestFactory = new RequestFactory($this->serializerMock);
     }
 
     /**

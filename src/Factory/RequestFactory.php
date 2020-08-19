@@ -41,7 +41,7 @@ class RequestFactory
      * @param string $type
      * @return object|RequestDTO
      */
-    public function createByType(Request $httpRequest, string $type): object
+    public function createFromJsonBody(Request $httpRequest, string $type): object
     {
         /** @var object|RequestDTO $request */
         $request = $this->serializer->deserialize(

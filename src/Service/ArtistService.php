@@ -48,7 +48,7 @@ class ArtistService
         );
     }
 
-    public function updateArtist(Artist $artist, SaveArtistRequest $request): Artist
+    public function update(Artist $artist, SaveArtistRequest $request): Artist
     {
         $artist->setName($request->getName());
 
@@ -63,9 +63,9 @@ class ArtistService
         return $artist;
     }
 
-    public function createArtist(SaveArtistRequest $request): Artist
+    public function create(SaveArtistRequest $request): Artist
     {
-        $artist = (new Artist())->setName($request->getName());
+        $artist = (new Artist())->setName((string)$request->getName());
 
         $violations = $this->validator->validate($artist);
         if (0 !== count($violations)) {
