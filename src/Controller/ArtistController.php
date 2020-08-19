@@ -6,6 +6,7 @@ use App\Entity\Artist;
 use App\Exception\ValidationException;
 use App\Factory\JsonResponseFactory;
 use App\Factory\RequestFactory;
+use App\Request\SaveArtistRequest;
 use App\Service\ArtistService;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
@@ -19,17 +20,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * @Route(path="/artists")
  * @SWG\Tag(name="Artists")
  */
-class ArtistController
+class ArtistController extends BaseRestController
 {
-    private const MESSAGE_NOT_FOUND = 'Artist not found';
+    protected const MESSAGE_NOT_FOUND = 'Artist not found';
 
     private ArtistService $artistService;
-
-    private RequestFactory $requestFactory;
-
-    private JsonResponseFactory $responseFactory;
-
-    private ValidatorInterface $validator;
 
     public function __construct(
         ArtistService $artistService,
@@ -126,15 +121,99 @@ class ArtistController
     {
         $request = $this->requestFactory->createGenericFilterRequest($httpRequest, 5, 0);
 
-        $violations = $this->validator->validate($request, null, ['getArtist']);
-
-        if (0 !== count($violations)) {
-            throw new ValidationException($violations);
-        }
+        $this->validateRequestDTO($request, ['getArtist']);
 
         return $this->responseFactory->createJsonResponse(
             $this->artistService->findAll($request),
             ['getArtist']
+        );
+    }
+
+    /**
+     * @Route(methods={"PUT"}, path="/{id<\d+>}")
+     * @SWG\Parameter(
+     *     name="artist",
+     *     in="body",
+     *     required=true,
+     *     @Model(type=Artist::class, groups={"putArtist"})
+     * )
+     * @SWG\Response(
+     *     response=JsonResponse::HTTP_OK,
+     *     description="Artist updated successfully",
+     *     @SWG\Schema(
+     *         type="array",
+     *         @SWG\Items(ref=@Model(type=Artist::class, groups={"getArtist"}))
+     *     )
+     * )
+     * @SWG\Response(
+     *     response=JsonResponse::HTTP_NOT_FOUND,
+     *     description="Artist not found",
+     * )
+     * @SWG\Response(
+     *     response=JsonResponse::HTTP_BAD_REQUEST,
+     *     description="Invalid request body",
+     * )
+     *
+     * @param Request $httpRequest
+     * @param Artist|null $artist
+     * @return JsonResponse
+     */
+    public function putAction(Request $httpRequest, ?Artist $artist = null): JsonResponse
+    {
+        if (null === $artist) {
+            throw new NotFoundHttpException(self::MESSAGE_NOT_FOUND);
+        }
+
+        $this->validateJsonBody($httpRequest);
+
+        /** @var SaveArtistRequest $request */
+        $request = $this->requestFactory->createByType($httpRequest, SaveArtistRequest::class);
+
+        $this->validateRequestDTO($request, ['putArtist']);
+
+        return $this->responseFactory->createJsonResponse(
+            $this->artistService->updateArtist($artist, $request),
+            ['getArtist']
+        );
+    }
+
+    /**
+     * @Route(methods={"POST"}, path="")
+     * @SWG\Parameter(
+     *     name="artist",
+     *     in="body",
+     *     required=true,
+     *     @Model(type=Artist::class, groups={"postArtist"})
+     * )
+     * @SWG\Response(
+     *     response=JsonResponse::HTTP_CREATED,
+     *     description="Artist created successfully",
+     *     @SWG\Schema(
+     *         type="array",
+     *         @SWG\Items(ref=@Model(type=Artist::class, groups={"getArtist"}))
+     *     )
+     * )
+     * @SWG\Response(
+     *     response=JsonResponse::HTTP_BAD_REQUEST,
+     *     description="Invalid request body",
+     * )
+     *
+     * @param Request $httpRequest
+     * @return JsonResponse
+     */
+    public function postAction(Request $httpRequest): JsonResponse
+    {
+        $this->validateJsonBody($httpRequest);
+
+        /** @var SaveArtistRequest $request */
+        $request = $this->requestFactory->createByType($httpRequest, SaveArtistRequest::class);
+
+        $this->validateRequestDTO($request, ['postArtist']);
+
+        return $this->responseFactory->createJsonResponse(
+            $this->artistService->createArtist($request),
+            ['getArtist'],
+            JsonResponse::HTTP_CREATED
         );
     }
 }

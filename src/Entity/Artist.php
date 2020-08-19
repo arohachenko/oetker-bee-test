@@ -3,12 +3,15 @@
 namespace App\Entity;
 
 use App\Repository\ArtistRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=ArtistRepository::class)
+ * @UniqueEntity("name")
  * @ORM\Table(name="artist", uniqueConstraints={
  *     @ORM\UniqueConstraint(name="name_uniq", columns={"name"})
  * })
@@ -40,6 +43,11 @@ class Artist
      * @Groups({"getArtist"})
      */
     private Collection $records;
+
+    public function __construct()
+    {
+        $this->records = new ArrayCollection();
+    }
 
     /**
      * @return int

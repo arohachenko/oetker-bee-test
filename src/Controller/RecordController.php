@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Record;
-use App\Exception\ValidationException;
 use App\Factory\JsonResponseFactory;
 use App\Factory\RequestFactory;
 use App\Service\RecordService;
@@ -19,17 +18,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * @Route(path="/records")
  * @SWG\Tag(name="Records")
  */
-class RecordController
+class RecordController extends BaseRestController
 {
-    private const MESSAGE_NOT_FOUND = 'Record not found';
+    protected const MESSAGE_NOT_FOUND = 'Record not found';
 
     private RecordService $recordService;
-
-    private RequestFactory $requestFactory;
-
-    private JsonResponseFactory $responseFactory;
-
-    private ValidatorInterface $validator;
 
     public function __construct(
         RecordService $recordService,
@@ -140,11 +133,7 @@ class RecordController
     {
         $request = $this->requestFactory->createGenericFilterRequest($httpRequest, 20, 0);
 
-        $violations = $this->validator->validate($request, null, ['getRecord']);
-
-        if (0 !== count($violations)) {
-            throw new ValidationException($violations);
-        }
+        $this->validateRequestDTO($request, ['getRecord']);
 
         return $this->responseFactory->createJsonResponse(
             $this->recordService->findAll($request),

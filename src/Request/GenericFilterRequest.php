@@ -4,7 +4,7 @@ namespace App\Request;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-class GenericFilterRequest
+class GenericFilterRequest extends RequestDTO
 {
     /**
      * @Assert\Type(type="numeric", groups={"getArtist", "getRecord"})
