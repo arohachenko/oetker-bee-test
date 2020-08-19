@@ -9,6 +9,7 @@ use App\Service\ArtistService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ArtistServiceTest extends TestCase
 {
@@ -23,6 +24,11 @@ class ArtistServiceTest extends TestCase
     private MockObject $repositoryMock;
 
     /**
+     * @var MockObject|ValidatorInterface
+     */
+    private MockObject $validatorMock;
+
+    /**
      * @var ArtistService
      */
     private ArtistService $artistService;
@@ -31,7 +37,8 @@ class ArtistServiceTest extends TestCase
     {
         $this->entityManagerMock = $this->createMock(EntityManagerInterface::class);
         $this->repositoryMock = $this->createMock(ArtistRepository::class);
-        $this->artistService = new ArtistService($this->entityManagerMock, $this->repositoryMock);
+        $this->validatorMock = $this->createMock(ValidatorInterface::class);
+        $this->artistService = new ArtistService($this->entityManagerMock, $this->repositoryMock, $this->validatorMock);
     }
 
     public function testDelete(): void

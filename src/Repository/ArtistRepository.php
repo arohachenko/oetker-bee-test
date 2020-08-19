@@ -6,6 +6,9 @@ use App\Entity\Artist;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @method Artist findOneBy(array $criteria, array $orderBy = null)
+ */
 class ArtistRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -13,4 +16,3 @@ class ArtistRepository extends ServiceEntityRepository
         parent::__construct($registry, Artist::class);
     }
 }
-

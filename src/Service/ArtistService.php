@@ -3,9 +3,12 @@
 namespace App\Service;
 
 use App\Entity\Artist;
+use App\Exception\ValidationException;
 use App\Repository\ArtistRepository;
 use App\Request\GenericFilterRequest;
+use App\Request\SaveArtistRequest;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ArtistService
 {
@@ -13,10 +16,16 @@ class ArtistService
 
     private ArtistRepository $artistRepository;
 
-    public function __construct(EntityManagerInterface $entityManager, ArtistRepository $artistRepository)
-    {
+    private ValidatorInterface $validator;
+
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        ArtistRepository $artistRepository,
+        ValidatorInterface $validator
+    ) {
         $this->entityManager = $entityManager;
         $this->artistRepository = $artistRepository;
+        $this->validator = $validator;
     }
 
     public function delete(Artist $artist): void
@@ -37,5 +46,35 @@ class ArtistService
             (int)$request->getLimit(),
             (int)$request->getOffset()
         );
+    }
+
+    public function update(Artist $artist, SaveArtistRequest $request): Artist
+    {
+        $artist->setName($request->getName());
+
+        $violations = $this->validator->validate($artist);
+        if (0 !== count($violations)) {
+            throw new ValidationException($violations);
+        }
+
+        $this->entityManager->persist($artist);
+        $this->entityManager->flush();
+
+        return $artist;
+    }
+
+    public function create(SaveArtistRequest $request): Artist
+    {
+        $artist = (new Artist())->setName((string)$request->getName());
+
+        $violations = $this->validator->validate($artist);
+        if (0 !== count($violations)) {
+            throw new ValidationException($violations);
+        }
+
+        $this->entityManager->persist($artist);
+        $this->entityManager->flush();
+
+        return $artist;
     }
 }
