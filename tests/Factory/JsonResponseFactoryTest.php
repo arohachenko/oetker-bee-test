@@ -50,12 +50,12 @@ class JsonResponseFactoryTest extends TestCase
 
     public function testCreateErrorResponseFromHttpException(): void
     {
-        $exception = new HttpException(404);
+        $exception = new HttpException(403);
         $this->serializerMock->method('serialize')->willReturn('');
         $this->loggerMock->expects(self::once())->method('warning');
 
         $response = $this->jsonResponseFactory->createErrorResponse($exception);
-        self::assertSame(404, $response->getStatusCode());
+        self::assertSame(403, $response->getStatusCode());
     }
 
     public function testCreateErrorResponseFromValidationException(): void
@@ -71,7 +71,7 @@ class JsonResponseFactoryTest extends TestCase
         $this->loggerMock->expects(self::once())->method('warning');
 
         $response = $this->jsonResponseFactory->createErrorResponse($exception);
-        self::assertSame(400, $response->getStatusCode());
+        self::assertSame(422, $response->getStatusCode());
     }
 
     public function testCreateJsonResponseFromObject(): void

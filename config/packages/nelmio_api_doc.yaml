@@ -5,6 +5,14 @@ nelmio_api_doc:
             title: Records API
             description: RESTful CRUD for managing a record shop
             version: 1.0.0
+        securityDefinitions:
+            Bearer:
+                type: apiKey
+                description: 'Value: Bearer {jwt}'
+                name: Authorization
+                in: header
+        security:
+            - Bearer: []
     areas: # to filter documented areas
         path_patterns:
-            - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
+            - ^/api(?!/doc(.json)?$) # Accepts routes under /api except /api/doc(.json)
