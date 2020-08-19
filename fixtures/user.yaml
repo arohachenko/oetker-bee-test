@@ -1,0 +1,5 @@
+App\Entity\User:
+  user_1:
+    __construct: ['admin']
+  user_2:
+    __construct: ['user']

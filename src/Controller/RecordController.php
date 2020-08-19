@@ -170,7 +170,7 @@ class RecordController extends BaseRestController
      *     description="Record not found",
      * )
      * @SWG\Response(
-     *     response=JsonResponse::HTTP_BAD_REQUEST,
+     *     response=JsonResponse::HTTP_UNPROCESSABLE_ENTITY,
      *     description="Invalid request body",
      * )
      *
@@ -215,7 +215,7 @@ class RecordController extends BaseRestController
      *     )
      * )
      * @SWG\Response(
-     *     response=JsonResponse::HTTP_BAD_REQUEST,
+     *     response=JsonResponse::HTTP_UNPROCESSABLE_ENTITY,
      *     description="Invalid request body",
      * )
      *
