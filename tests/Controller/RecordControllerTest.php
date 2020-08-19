@@ -8,6 +8,7 @@ use App\Exception\ValidationException;
 use App\Factory\JsonResponseFactory;
 use App\Factory\RequestFactory;
 use App\Request\GenericFilterRequest;
+use App\Request\SaveRecordRequest;
 use App\Service\RecordService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -147,5 +148,212 @@ class RecordControllerTest extends TestCase
 
         self::expectException(ValidationException::class);
         $this->controller->getBulkAction($httpRequestMock);
+    }
+
+    public function testPutAction(): void
+    {
+        /** @var MockObject|Request $httpRequestMock */
+        $httpRequestMock = $this->createMock(Request::class);
+        $content = 'test';
+        $httpRequestMock->method('getContent')->willReturn($content);
+        /** @var MockObject|SaveRecordRequest $requestMock */
+        $requestMock = $this->createMock(SaveRecordRequest::class);
+        $this->requestFactoryMock
+            ->method('createFromJsonBody')
+            ->with($httpRequestMock)
+            ->willReturn($requestMock);
+
+        /** @var MockObject|ConstraintViolationListInterface $violationsMock */
+        $violationsMock = $this->createMock(ConstraintViolationListInterface::class);
+        $violationsMock->method('count')->willReturn(0);
+
+        $this->validatorMock
+            ->expects(self::at(0))
+            ->method('validate')
+            ->with($content)
+            ->willReturn($violationsMock);
+        $this->validatorMock
+            ->expects(self::at(1))
+            ->method('validate')
+            ->with($requestMock)
+            ->willReturn($violationsMock);
+
+        /** @var MockObject|Record $entityMock */
+        $entityMock = $this->createMock(Record::class);
+        $responseMock = $this->createMock(JsonResponse::class);
+
+        $this->recordServiceMock->expects(self::once())->method('update')->with($entityMock, $requestMock);
+        $this->responseFactoryMock->method('createJsonResponse')->willReturn($responseMock);
+
+        self::assertSame($responseMock, $this->controller->putAction($httpRequestMock, $entityMock));
+    }
+
+    public function testPutActionNotFound(): void
+    {
+        /** @var MockObject|Request $httpRequestMock */
+        $httpRequestMock = $this->createMock(Request::class);
+
+        $this->recordServiceMock->expects(self::never())->method('update');
+
+        self::expectException(NotFoundHttpException::class);
+        $this->controller->putAction($httpRequestMock, null);
+    }
+
+    public function testPutActionInvalidJson(): void
+    {
+        /** @var MockObject|Request $httpRequestMock */
+        $httpRequestMock = $this->createMock(Request::class);
+        $content = 'test';
+        $httpRequestMock->method('getContent')->willReturn($content);
+        /** @var MockObject|Record $entityMock */
+        $entityMock = $this->createMock(Record::class);
+
+        /** @var MockObject|ConstraintViolationListInterface $violationsMock */
+        $violationsMock = $this->createMock(ConstraintViolationListInterface::class);
+        $violationsMock->method('count')->willReturn(1);
+
+        $this->validatorMock
+            ->method('validate')
+            ->with($content)
+            ->willReturn($violationsMock);
+
+        $this->recordServiceMock->expects(self::never())->method('update');
+
+        self::expectException(ValidationException::class);
+        $this->controller->putAction($httpRequestMock, $entityMock);
+    }
+
+    public function testPutActionInvalidRequest(): void
+    {
+        /** @var MockObject|Request $httpRequestMock */
+        $httpRequestMock = $this->createMock(Request::class);
+        $content = 'test';
+        $httpRequestMock->method('getContent')->willReturn($content);
+        /** @var MockObject|Record $entityMock */
+        $entityMock = $this->createMock(Record::class);
+        /** @var MockObject|SaveRecordRequest $requestMock */
+        $requestMock = $this->createMock(SaveRecordRequest::class);
+        $this->requestFactoryMock
+            ->method('createFromJsonBody')
+            ->willReturn($requestMock);
+
+        /** @var MockObject|ConstraintViolationListInterface $goodViolationsMock */
+        $goodViolationsMock = $this->createMock(ConstraintViolationListInterface::class);
+        $goodViolationsMock->method('count')->willReturn(0);
+
+        /** @var MockObject|ConstraintViolationListInterface $goodViolationsMock */
+        $badViolationsMock = $this->createMock(ConstraintViolationListInterface::class);
+        $badViolationsMock->method('count')->willReturn(1);
+
+        $this->validatorMock
+            ->expects(self::at(0))
+            ->method('validate')
+            ->with($content)
+            ->willReturn($goodViolationsMock);
+        $this->validatorMock
+            ->expects(self::at(1))
+            ->method('validate')
+            ->with($requestMock)
+            ->willReturn($badViolationsMock);
+
+        $this->recordServiceMock->expects(self::never())->method('update');
+
+        self::expectException(ValidationException::class);
+        $this->controller->putAction($httpRequestMock, $entityMock);
+    }
+
+    public function testPostAction(): void
+    {
+        /** @var MockObject|Request $httpRequestMock */
+        $httpRequestMock = $this->createMock(Request::class);
+        $content = 'test';
+        $httpRequestMock->method('getContent')->willReturn($content);
+        /** @var MockObject|SaveRecordRequest $requestMock */
+        $requestMock = $this->createMock(SaveRecordRequest::class);
+        $this->requestFactoryMock
+            ->method('createFromJsonBody')
+            ->with($httpRequestMock)
+            ->willReturn($requestMock);
+
+        /** @var MockObject|ConstraintViolationListInterface $violationsMock */
+        $violationsMock = $this->createMock(ConstraintViolationListInterface::class);
+        $violationsMock->method('count')->willReturn(0);
+
+        $this->validatorMock
+            ->expects(self::at(0))
+            ->method('validate')
+            ->with($content)
+            ->willReturn($violationsMock);
+        $this->validatorMock
+            ->expects(self::at(1))
+            ->method('validate')
+            ->with($requestMock)
+            ->willReturn($violationsMock);
+
+        $responseMock = $this->createMock(JsonResponse::class);
+
+        $this->recordServiceMock->expects(self::once())->method('create')->with($requestMock);
+        $this->responseFactoryMock->method('createJsonResponse')->willReturn($responseMock);
+
+        self::assertSame($responseMock, $this->controller->postAction($httpRequestMock));
+    }
+
+    public function testPostActionInvalidJson(): void
+    {
+        /** @var MockObject|Request $httpRequestMock */
+        $httpRequestMock = $this->createMock(Request::class);
+        $content = 'test';
+        $httpRequestMock->method('getContent')->willReturn($content);
+
+        /** @var MockObject|ConstraintViolationListInterface $violationsMock */
+        $violationsMock = $this->createMock(ConstraintViolationListInterface::class);
+        $violationsMock->method('count')->willReturn(1);
+
+        $this->validatorMock
+            ->method('validate')
+            ->with($content)
+            ->willReturn($violationsMock);
+
+        $this->recordServiceMock->expects(self::never())->method('create');
+
+        self::expectException(ValidationException::class);
+        $this->controller->postAction($httpRequestMock);
+    }
+
+    public function testPostActionInvalidRequest(): void
+    {
+        /** @var MockObject|Request $httpRequestMock */
+        $httpRequestMock = $this->createMock(Request::class);
+        $content = 'test';
+        $httpRequestMock->method('getContent')->willReturn($content);
+        /** @var MockObject|SaveRecordRequest $requestMock */
+        $requestMock = $this->createMock(SaveRecordRequest::class);
+        $this->requestFactoryMock
+            ->method('createFromJsonBody')
+            ->willReturn($requestMock);
+
+        /** @var MockObject|ConstraintViolationListInterface $goodViolationsMock */
+        $goodViolationsMock = $this->createMock(ConstraintViolationListInterface::class);
+        $goodViolationsMock->method('count')->willReturn(0);
+
+        /** @var MockObject|ConstraintViolationListInterface $goodViolationsMock */
+        $badViolationsMock = $this->createMock(ConstraintViolationListInterface::class);
+        $badViolationsMock->method('count')->willReturn(1);
+
+        $this->validatorMock
+            ->expects(self::at(0))
+            ->method('validate')
+            ->with($content)
+            ->willReturn($goodViolationsMock);
+        $this->validatorMock
+            ->expects(self::at(1))
+            ->method('validate')
+            ->with($requestMock)
+            ->willReturn($badViolationsMock);
+
+        $this->recordServiceMock->expects(self::never())->method('create');
+
+        self::expectException(ValidationException::class);
+        $this->controller->postAction($httpRequestMock);
     }
 }

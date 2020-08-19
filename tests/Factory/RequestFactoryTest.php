@@ -3,6 +3,7 @@
 namespace App\Tests\Factory;
 
 use App\Factory\RequestFactory;
+use App\Request\RequestDTO;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\InputBag;
@@ -24,6 +25,20 @@ class RequestFactoryTest extends TestCase
         $this->requestFactory = new RequestFactory($this->serializerMock);
     }
 
+    public function testCreateFromJsonBody(): void
+    {
+        $content = 'json';
+        $result = $this->createMock(RequestDTO::class);
+
+        /** @var MockObject|Request $httpRequestMock */
+        $httpRequestMock = $this->createMock(Request::class);
+        $httpRequestMock->method('getContent')->willReturn($content);
+
+        $this->serializerMock->method('deserialize')->with($content)->willReturn($result);
+
+        self::assertSame($result, $this->requestFactory->createFromJsonBody($httpRequestMock, ''));
+    }
+
     /**
      * @param array $queryParams
      * @param $expectedLimit
@@ -40,7 +55,7 @@ class RequestFactoryTest extends TestCase
         $expectedAuthor,
         $expectedTitle,
         $expectedYear
-    ) {
+    ): void {
         $queryBag = new InputBag($queryParams);
 
         /** @var MockObject|Request $requestMock */
