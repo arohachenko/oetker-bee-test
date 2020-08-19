@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class GenericFilterRequestTest extends TestCase
 {
-    public function testCreateRequest()
+    public function testCreateRequest(): void
     {
         $limit = '1';
         $offset = '-2';

@@ -45,6 +45,10 @@ class RecordController extends BaseRestController
      *     response=JsonResponse::HTTP_NO_CONTENT,
      *     description="Deletion successful",
      * )
+     * @SWG\Response(
+     *     response=JsonResponse::HTTP_NOT_FOUND,
+     *     description="Could'n find record with this ID",
+     * )
      *
      * @param Record|null $record
      * @return JsonResponse
@@ -69,7 +73,7 @@ class RecordController extends BaseRestController
      * )
      * @SWG\Response(
      *     response=JsonResponse::HTTP_NOT_FOUND,
-     *     description="Could'n find record with this ID",
+     *     description="Could'nt find record with this ID",
      * )
      *
      * @param Record|null $record

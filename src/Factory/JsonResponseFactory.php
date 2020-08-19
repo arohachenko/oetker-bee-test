@@ -48,15 +48,15 @@ class JsonResponseFactory implements LoggerAwareInterface
      */
     public function createErrorResponse(Throwable $exception): JsonResponse
     {
-        $response = $this->serializer->serialize(['message' => $exception->getMessage()], 'json');
+        $message = $this->serializer->serialize($exception->getMessage(), 'json');
 
         if ($exception instanceof ValidationException) {
             $statusCode = $exception->getStatusCode();
-            $response = $this->serializer->serialize($exception->getList(), 'json');
+            $message = $this->serializer->serialize($exception->getList(), 'json');
         } elseif ($exception instanceof HttpException) {
             $statusCode = $exception->getStatusCode();
             if (JsonResponse::HTTP_FORBIDDEN === $statusCode) {
-                $response = json_encode('Unauthorized, admin role required.');
+                $message = json_encode('Unauthorized, admin role required.');
             }
         } else {
             $statusCode = JsonResponse::HTTP_INTERNAL_SERVER_ERROR;
@@ -64,6 +64,6 @@ class JsonResponseFactory implements LoggerAwareInterface
 
         $this->logger->warning(sprintf('%s: %s', get_class($exception), $exception->getMessage()));
 
-        return new JsonResponse(sprintf('{"code": %d, "message": %s}', $statusCode, $response), $statusCode, [], true);
+        return new JsonResponse(sprintf('{"code": %d, "message": %s}', $statusCode, $message), $statusCode, [], true);
     }
 }
