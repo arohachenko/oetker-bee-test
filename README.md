@@ -1,7 +1,4 @@
-[![Build Status](https://travis-ci.org/arohachenko/oetker-bee-test.svg?branch=develop)](https://travis-ci.org/arohachenko/oetker-bee-test)
-[![codecov](https://codecov.io/gh/arohachenko/oetker-bee-test/branch/develop/graph/badge.svg)](https://codecov.io/gh/arohachenko/oetker-bee-test)
-
-## OetkerDigital code challenge
+## OetkerDigital code challenge [![Build Status](https://travis-ci.org/arohachenko/oetker-bee-test.svg?branch=develop)](https://travis-ci.org/arohachenko/oetker-bee-test) [![codecov](https://codecov.io/gh/arohachenko/oetker-bee-test/branch/develop/graph/badge.svg)](https://codecov.io/gh/arohachenko/oetker-bee-test)
 
 Hello! This is an attempt at the code challenge for Senior Backend Engineer position.
 
