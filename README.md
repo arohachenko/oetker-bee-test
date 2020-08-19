@@ -46,7 +46,7 @@ make migrate
 ```
 This will execute the necessary DB migrations.
  
-The application now runs on your local docker host (http://host.docker.internal on Windows, or http://localhost on Linux/maxOS by default).
+The application now runs on your local docker host (http://host.docker.internal on Windows, or http://localhost on Linux/macOS by default).
 
 You should see the Api Doc interface.
 
