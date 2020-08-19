@@ -160,10 +160,7 @@ class RecordController extends BaseRestController
      * @SWG\Response(
      *     response=JsonResponse::HTTP_OK,
      *     description="Record updated successfully",
-     *     @SWG\Schema(
-     *         type="array",
-     *         @SWG\Items(ref=@Model(type=Record::class, groups={"getRecord"}))
-     *     )
+     *     @Model(type=Record::class, groups={"getRecord"})
      * )
      * @SWG\Response(
      *     response=JsonResponse::HTTP_NOT_FOUND,
@@ -209,10 +206,7 @@ class RecordController extends BaseRestController
      * @SWG\Response(
      *     response=JsonResponse::HTTP_CREATED,
      *     description="Record created successfully",
-     *     @SWG\Schema(
-     *         type="array",
-     *         @SWG\Items(ref=@Model(type=Record::class, groups={"getRecord"}))
-     *     )
+     *     @Model(type=Record::class, groups={"getRecord"})
      * )
      * @SWG\Response(
      *     response=JsonResponse::HTTP_UNPROCESSABLE_ENTITY,

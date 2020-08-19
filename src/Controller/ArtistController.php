@@ -142,10 +142,7 @@ class ArtistController extends BaseRestController
      * @SWG\Response(
      *     response=JsonResponse::HTTP_OK,
      *     description="Artist updated successfully",
-     *     @SWG\Schema(
-     *         type="array",
-     *         @SWG\Items(ref=@Model(type=Artist::class, groups={"getArtist"}))
-     *     )
+     *     @Model(type=Artist::class, groups={"getArtist"})
      * )
      * @SWG\Response(
      *     response=JsonResponse::HTTP_NOT_FOUND,
@@ -191,10 +188,7 @@ class ArtistController extends BaseRestController
      * @SWG\Response(
      *     response=JsonResponse::HTTP_CREATED,
      *     description="Artist created successfully",
-     *     @SWG\Schema(
-     *         type="array",
-     *         @SWG\Items(ref=@Model(type=Artist::class, groups={"getArtist"}))
-     *     )
+     *     @Model(type=Artist::class, groups={"getArtist"})
      * )
      * @SWG\Response(
      *     response=JsonResponse::HTTP_UNPROCESSABLE_ENTITY,

@@ -41,6 +41,8 @@ This will build the app containers, if not available, and start them. It will in
 But it's not fully ready yet. Wait a few seconds for MySQL server to boot up, and run
 ```shell script
 make migrate
+
+# if you get an error in Windows, try `winpty make migrate`  
 ```
 This will execute the necessary DB migrations.
  
